@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            BigInt   @id @default(autoincrement())
+  accountId     BigInt   @unique @map("account_id")
+  username      String
+  hasPass       Boolean  @default(false) @map("has_pass")
+  registered_at DateTime @map("registered_at")
+
+  cards UserCard[]
+
+  player1   GameLog[] @relation("Player1GameLog")
+  player2   GameLog[] @relation("Player2GameLog")
+  victories GameLog[] @relation("WinnerGameLog")
+  defeats   GameLog[] @relation("LoserGameLog")
+
+  @@map("user")
+}
+
+model Card {
+  id              BigInt   @id @default(autoincrement())
+  artist          String
+  type            CardType
+  vocabulary      Int
+  fame            Int
+  originality     Int
+  versatility     Int
+  livePerformance Int      @map("live_performance")
+
+  users UserCard[]
+
+  @@map("card")
+}
+
+enum CardType {
+  DEFAULT
+  AUTOGRAPH
+  SEASON
+  LIMITED
+  LEGENDARY
+}
+
+model UserCard {
+  id         BigInt   @id @default(autoincrement())
+  acquiredAt DateTime @map("acquired_at")
+
+  userId BigInt @map("user_id")
+  cardId BigInt @map("card_id")
+
+  user User @relation(fields: [userId], references: [id])
+  card Card @relation(fields: [cardId], references: [id])
+
+  @@map("user_card")
+}
+
+model GameLog {
+  id       BigInt   @id @default(autoincrement())
+  playedAt DateTime @map("played_at")
+
+  player1Id BigInt @map("player1_id")
+  player2Id BigInt @map("player2_id")
+  winnerId  BigInt @map("winner_id")
+  loserId   BigInt @map("loser_id")
+
+  player1 User @relation("Player1GameLog", fields: [player1Id], references: [id])
+  player2 User @relation("Player2GameLog", fields: [player2Id], references: [id])
+  winner  User @relation("WinnerGameLog", fields: [winnerId], references: [id])
+  loser   User @relation("LoserGameLog", fields: [loserId], references: [id])
+
+  @@map("game_log")
+}
