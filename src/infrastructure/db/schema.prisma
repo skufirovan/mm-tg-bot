@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./generated"
+  output   = "./generated/client"
 }
 
 datasource db {
@@ -9,11 +9,11 @@ datasource db {
 }
 
 model User {
-  id            BigInt   @id @default(autoincrement())
-  accountId     BigInt   @unique @map("account_id")
-  username      String
-  hasPass       Boolean  @default(false) @map("has_pass")
-  registered_at DateTime @map("registered_at")
+  id           BigInt   @id @default(autoincrement())
+  accountId    BigInt   @unique @map("account_id")
+  username     String
+  hasPass      Boolean  @default(false) @map("has_pass")
+  registeredAt DateTime @default(now()) @map("registered_at")
 
   cards UserCard[]
 
@@ -50,7 +50,7 @@ enum CardType {
 
 model UserCard {
   id         BigInt   @id @default(autoincrement())
-  acquiredAt DateTime @map("acquired_at")
+  acquiredAt DateTime @default(now()) @map("acquired_at")
 
   userId BigInt @map("user_id")
   cardId BigInt @map("card_id")
@@ -63,7 +63,7 @@ model UserCard {
 
 model GameLog {
   id       BigInt   @id @default(autoincrement())
-  playedAt DateTime @map("played_at")
+  playedAt DateTime @default(now()) @map("played_at")
 
   player1Id BigInt @map("player1_id")
   player2Id BigInt @map("player2_id")
