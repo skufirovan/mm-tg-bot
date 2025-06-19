@@ -9,11 +9,12 @@ datasource db {
 }
 
 model User {
-  id           BigInt   @id @default(autoincrement())
-  accountId    BigInt   @unique @map("account_id")
-  username     String
-  hasPass      Boolean  @default(false) @map("has_pass")
-  registeredAt DateTime @default(now()) @map("registered_at")
+  id            BigInt    @id @default(autoincrement())
+  accountId     BigInt    @unique @map("account_id")
+  username      String?
+  hasPass       Boolean   @default(false) @map("has_pass")
+  passExpiresAt DateTime? @map("pass_expires_at")
+  registeredAt  DateTime  @default(now()) @map("registered_at")
 
   cards UserCard[]
 

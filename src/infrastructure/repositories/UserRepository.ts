@@ -6,7 +6,7 @@ export default class UserRepository {
     return prisma.user.findUnique({ where: { accountId } });
   }
 
-  static async create(accountId: number, username: string) {
+  static async create(accountId: number, username: string | null) {
     return prisma.user.create({
       data: {
         accountId,

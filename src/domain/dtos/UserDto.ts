@@ -1,7 +1,7 @@
 import { User } from "@infrastructure/db/generated/client";
 
 export default class UserDto {
-  readonly username: string;
+  readonly username: string | null;
   readonly hasPass: boolean;
   readonly registeredAt: Date;
 
