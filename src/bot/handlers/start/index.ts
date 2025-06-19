@@ -1,1 +1,1 @@
-export { startHandler } from "./start.handler";
+export { handleStart } from "./start.handler";
