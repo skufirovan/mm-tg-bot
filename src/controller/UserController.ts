@@ -2,13 +2,21 @@ import UserService from "@core/UserService";
 import UserDto from "@domain/dtos/UserDto";
 
 export default class UserController {
-  static async register(accountId: number, username: string) {
-    const user = await UserService.register(accountId, username);
-    return new UserDto(user);
+  static async register(accountId: number, username: string | null) {
+    try {
+      const user = await UserService.register(accountId, username);
+      return new UserDto(user);
+    } catch (error) {
+      throw error;
+    }
   }
 
   static async getByAccountId(accountId: number) {
-    const user = await UserService.getByAccountId(accountId);
-    return user ? new UserDto(user) : null;
+    try {
+      const user = await UserService.getByAccountId(accountId);
+      return user ? new UserDto(user) : null;
+    } catch (error) {
+      throw error;
+    }
   }
 }

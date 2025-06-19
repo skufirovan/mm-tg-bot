@@ -21,7 +21,7 @@ export const handleProfile = async (ctx: Context) => {
 
   await ctx.reply(
     `👋 Привет, ${
-      user.username
+      user.username ?? "игрок"
     }\n📆 Ты зарегистрировался ${formatDateToDDMMYYYY(
       user.registeredAt
     )}\n👑 Статус пасса: ${user.hasPass ? "активен" : "не активен"}`
