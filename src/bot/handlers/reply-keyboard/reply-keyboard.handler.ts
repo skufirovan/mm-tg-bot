@@ -19,7 +19,7 @@ export const handleMenu = async (ctx: Context) => {
 };
 
 export const handleProfile = async (ctx: Context) => {
-  const accountId = ctx.from?.id;
+  const accountId = ctx.from?.id ? BigInt(ctx.from.id) : undefined;
   const isTextMessage = ctx.message && "text" in ctx.message;
 
   const meta = {

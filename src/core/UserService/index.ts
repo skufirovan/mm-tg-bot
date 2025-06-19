@@ -2,7 +2,7 @@ import UserRepository from "@infrastructure/repositories/UserRepository";
 import serviceLogger from "@infrastructure/logger/serviceLogger";
 
 const cache = new Map<
-  number,
+  bigint,
   {
     user: Awaited<ReturnType<typeof UserRepository.findByAccountId>>;
     timestamp: number;
@@ -11,7 +11,7 @@ const cache = new Map<
 const TTL = 15 * 1000 * 60;
 
 export default class UserService {
-  static async register(accountId: number, username: string | null) {
+  static async register(accountId: bigint, username: string | null) {
     const meta = {
       userId: accountId,
       username: username ?? undefined,
@@ -72,7 +72,7 @@ export default class UserService {
     }
   }
 
-  static async getByAccountId(accountId: number) {
+  static async getByAccountId(accountId: bigint) {
     const meta = { userId: accountId };
     const now = Date.now();
 

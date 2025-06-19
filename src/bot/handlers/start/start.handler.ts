@@ -10,7 +10,7 @@ export const handleStart = async (ctx: Context) => {
   };
 
   try {
-    const accountId = ctx.from?.id;
+    const accountId = ctx.from?.id ? BigInt(ctx.from.id) : undefined;
     const username = ctx.from?.username ?? null;
 
     if (!accountId) {
