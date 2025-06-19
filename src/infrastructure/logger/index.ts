@@ -15,6 +15,34 @@ const colorizedFormat = winston.format.combine(
   )
 );
 
+export const appLoggerInstance = winston.createLogger({
+  level: "info",
+  format: baseFormat,
+  transports: [
+    new winston.transports.Console({
+      format: colorizedFormat,
+    }),
+    new winston.transports.File({ filename: "logs/app.log" }),
+  ],
+  exceptionHandlers: [
+    new winston.transports.File({ filename: "logs/exceptions.log" }),
+  ],
+});
+
+export const userActionsLoggerInstance = winston.createLogger({
+  level: "info",
+  format: baseFormat,
+  transports: [
+    new winston.transports.Console({
+      format: colorizedFormat,
+    }),
+    new winston.transports.File({ filename: "logs/user-actions.log" }),
+  ],
+  exceptionHandlers: [
+    new winston.transports.File({ filename: "logs/exceptions.log" }),
+  ],
+});
+
 export const serviceLoggerInstance = winston.createLogger({
   level: "info",
   format: baseFormat,
