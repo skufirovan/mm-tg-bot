@@ -1,5 +1,5 @@
 import { prisma } from "@infrastructure/db/client";
-import { User } from "@domain/entities/User";
+import { User } from "@infrastructure/db/generated/client";
 
 export default class UserRepository {
   static async findByAccountId(accountId: bigint) {

@@ -1,6 +1,6 @@
 import UserRepository from "@infrastructure/repositories/UserRepository";
 import serviceLogger from "@infrastructure/logger/serviceLogger";
-import { User } from "@domain/entities/User";
+import { User } from "@infrastructure/db/generated/client";
 
 export default class UserService {
   static async register(
