@@ -1,46 +1,21 @@
 import UserRepository from "@infrastructure/repositories/UserRepository";
 import serviceLogger from "@infrastructure/logger/serviceLogger";
-
-const cache = new Map<
-  bigint,
-  {
-    user: Awaited<ReturnType<typeof UserRepository.findByAccountId>>;
-    timestamp: number;
-  }
->();
-const TTL = 15 * 1000 * 60;
+import { User } from "@domain/entities/User";
 
 export default class UserService {
-  static async register(accountId: bigint, username: string | null) {
+  static async register(
+    accountId: bigint,
+    username: string | null
+  ): Promise<User> {
     const meta = {
       userId: accountId,
-      username: username ?? undefined,
+      username,
     };
 
     try {
-      const existingUser = await UserRepository.findByAccountId(accountId);
+      const updatedUser = await this.SyncUsername(accountId, username);
 
-      if (existingUser) {
-        if (existingUser.username !== username) {
-          await UserRepository.updateField(accountId, "username", username);
-
-          let message = "";
-          const was = existingUser.username;
-          const now = username;
-
-          if (!was && now) {
-            message = `Установлен username: @${now}`;
-          } else if (was && !now) {
-            message = `Удалён username: был @${was}`;
-          } else {
-            message = `Сменил username: был @${was}, стал @${now}`;
-          }
-
-          serviceLogger("info", "UserService.register", message, meta);
-
-          return { ...existingUser, username };
-        }
-
+      if (updatedUser) {
         serviceLogger(
           "info",
           "UserService.register",
@@ -48,7 +23,7 @@ export default class UserService {
           meta
         );
 
-        return existingUser;
+        return updatedUser;
       }
 
       const newUser = await UserRepository.create(accountId, username);
@@ -72,36 +47,31 @@ export default class UserService {
     }
   }
 
-  static async getByAccountId(accountId: bigint) {
+  static async getByAccountId(accountId: bigint): Promise<User | null> {
     const meta = { userId: accountId };
-    const now = Date.now();
 
     try {
-      const cached = cache.get(accountId);
-
-      if (cached && now - cached.timestamp < TTL) {
-        serviceLogger(
-          "info",
-          "UserService.getByAccountId",
-          "Пользователь получен из кэша",
-          meta
-        );
-        return cached.user;
-      }
-
       const user = await UserRepository.findByAccountId(accountId);
 
       if (user) {
-        cache.set(accountId, { user, timestamp: now });
         serviceLogger(
           "info",
           "UserService.getByAccountId",
-          "Пользователь получен из БД и закэширован",
+          "Пользователь найден",
           meta
         );
+
+        return user;
       }
 
-      return user;
+      serviceLogger(
+        "info",
+        "UserService.getByAccountId",
+        "Пользователь не найден",
+        meta
+      );
+
+      return null;
     } catch (error) {
       serviceLogger(
         "error",
@@ -111,5 +81,37 @@ export default class UserService {
       );
       throw new Error("Ошибка при получении пользователя");
     }
+  }
+
+  static async SyncUsername(
+    accountId: bigint,
+    username: string | null
+  ): Promise<User | null> {
+    const meta = {
+      userId: accountId,
+      username,
+    };
+
+    const user = await UserRepository.findByAccountId(accountId);
+
+    if (!user) return null;
+    if (user.username === username) return user;
+
+    await UserRepository.updateField(accountId, "username", username);
+
+    let message = "";
+    const was = user.username;
+    const now = username;
+
+    if (!was && now) {
+      message = `Установлен username: @${now}`;
+    } else if (was && !now) {
+      message = `Удалён username: был @${was}`;
+    } else {
+      message = `Сменил username: был @${was}, стал @${now}`;
+    }
+
+    serviceLogger("info", "UserService.SyncUsername", message, meta);
+    return { ...user, username };
   }
 }
